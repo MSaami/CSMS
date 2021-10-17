@@ -1,24 +1,68 @@
-# Lumen PHP Framework
+# A Rest API for give a rating based on CDR
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://img.shields.io/packagist/l/laravel/framework)](https://packagist.org/packages/laravel/lumen-framework)
+A CSMS (charging station management system) such as be.ENERGISED is used to manage charging stations, charging
+processes and customers (so-called eDrivers) amongst other things.
+One of the most important functionalities of such a CSMS is to calculate a price to a particular charging process so that
+the eDriver can be invoiced for the consumed services. Establishing a price for a charging process is usually done by
+applying a rate to the CDR (charge detail record) of the corresponding charging process.
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+Main directories
+-------------------
 
-## Official Documentation
+      app/http/controllers/     contains web controller
+      app/services              contains business logic
+      tests/                    contains various tests for the basic application
 
-Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
+# Installation 
+-------------------------
+- Clone the project.
+- run `docker-compose up -d` to building the image and up containers //  For the first time, it may take some time.
+- run `docker-composer exec app composer install` to install project dependencies // For the first time, it may take some time.
+- You can then access the application through the `http://localhost:8000`
 
-## Contributing
 
-Thank you for considering contributing to Lumen! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# API Document
+-----------------
+- You can send data in `POST` to the following URL:
+```
+http://localhost:8000/api/v1/rate
+```
+- Body:
+```
+{
+    "rate": {
+        "energy": 0.3,
+        "time": 3,
+        "transaction": 1
+    },
+    "cdr": {
+        "meterStart": 1204307,
+        "timestampStart": "2021-04-05T10:04:00Z",
+        "meterStop": 1215230,
+        "timestampStop": "2021-04-05T11:27:00Z"
+    }
+}
+```
 
-## Security Vulnerabilities
+- Response:
+```
+{
+    "overall": 8.43,
+    "components": {
+        "energy": 3.277,
+        "time": 4.15,
+        "transaction": 1
+    }
+}
+```
+**Also there is a swagger document in the source code.**
 
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
 
-## License
+# Testing
+-------------------
+Tests are located in `tests` directory. They are developed by [PHPUnit](https://phpunit.de/)
+Tests can be executed by running:
+```
+vendor/bin/phpunit
+```
 
-The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
