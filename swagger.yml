@@ -1,0 +1,102 @@
+swagger: "2.0"
+info:
+  description: "This is a document for CSMS"
+  version: "1.0.0"
+  title: "CSMS"
+host: "localhost:8000"
+basePath: "/api/v1"
+paths:
+  /rate:
+    post:
+      tags:
+      - "Rate"
+      summary: "Get a rating based on given data"
+      description: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Rate object and cdr object"
+        required: true
+        schema:
+          $ref: "#/definitions/Rate"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            $ref: "#/definitions/SuccessResponse"
+        "422":
+          description: "Unprocessable Entity"
+          schema:
+            $ref: "#/definitions/InvalidData"
+definitions:
+  Rate:
+    type: "object"
+    properties:
+      cdr:
+        type: "object"
+        properties:
+          meterStart:
+            type: "integer"
+            example: 120989
+          meterStop:
+            type: "integer"
+            example: 130345
+          timestampStart:
+            type: "string"
+            format: "date-time"
+          timestampStop:
+            type: "string"
+            format: "date-time"
+      rate:
+        type: "object"
+        properties:
+          energy:
+            type: "integer"
+            example: 0.30
+            description: "rate the charging process based on the energy consumed"
+          time:
+            type: "integer"
+            example: 2
+            description: "rate the charging process based on its duration"
+          transaction:
+            type: "integer"
+            example: 1
+            description: "fees per charging process"
+  InvalidData:
+    example:
+      rate.energy:
+        - The rate.energy field is required.
+      rate.time:
+        - The rate.time field is required.
+      rate.transaction:
+        - The rate.transaction field is required.
+      cdr.meterStart:
+        - The cdr.meter start field is required.
+      cdr.meterStop:
+        - The cdr.meter stop field is required.
+      cdr.timestampStart:
+        - The cdr.timestamp start field is required.
+      cdr.timestampStop:
+        - The cdr.timestamp stop field is required.
+  SuccessResponse:
+    type: "object"
+    properties:
+      overall: 
+        type: "integer"
+        example: 4.5
+      components:
+        type: "object"
+        properties:
+          time:
+            type: "integer"
+            example: 3.2
+          energy:
+            type: "integer"
+            example: 2.3
+          transaction:
+            type: "integer"
+            example: 1
