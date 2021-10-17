@@ -10,6 +10,8 @@ class RateController extends Controller
 {
     public function store(Request $request)
     {
+        $this->validateStore($request);
+
         $consumedEnergyInKwh = ($request->input('cdr.meterStop') - $request->input('cdr.meterStart')) / 1000;
         $energyValue = $request->input('rate.energy');
         $energy = round($consumedEnergyInKwh * $energyValue, 3);
@@ -32,6 +34,20 @@ class RateController extends Controller
                 "transaction" => $transaction
             ]
         ]);
+    }
+
+    private function validateStore(Request $request)
+    {
+        $this->validate($request, [
+            'rate.energy' => ['required', 'numeric'],
+            'rate.time' => ['required', 'numeric'],
+            'rate.transaction' => ['required', 'numeric'],
+            'cdr.meterStart' => ['required', 'integer'],
+            'cdr.meterStop' => ['required', 'integer'],
+            'cdr.timestampStart' => ['required', 'date'],
+            'cdr.timestampStop' => ['required', 'date'],
+        ]);
+
     }
 
 }
