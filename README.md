@@ -17,7 +17,7 @@ Main directories
 -------------------------
 - Clone the project.
 - run `docker-compose up -d` to building the image and up containers //  For the first time, it may take some time.
-- run `docker-composer exec app composer install` to install project dependencies // For the first time, it may take some time.
+- run `docker-compose exec app composer install` to install project dependencies // For the first time, it may take some time.
 - You can then access the application through the `http://localhost:8000`
 
 
