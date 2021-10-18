@@ -3,44 +3,34 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\RatingService;
+use App\Services\RatingCalculator;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class RateController extends Controller
 {
-    private $ratingService;
+    private $ratingCalculator;
 
-    public function __construct(RatingService $ratingService)
+    public function __construct(RatingCalculator $ratingCalculator)
     {
-        $this->ratingService = $ratingService;
+        $this->ratingCalculator = $ratingCalculator;
     }
     public function store(Request $request)
     {
         $this->validateStore($request);
 
-        $energy = $this->ratingService->calculateEnergyRate(
-            $request->input('cdr.meterStart'),
-            $request->input('cdr.meterStop'),
-            $request->input('rate.energy')
+        $overallwithDetails = $this->ratingCalculator->calculateOverallWithDetails(
+            $request->input('cdr'),
+            $request->input('rate')
         );
 
-        $time = $this->ratingService->calculateElpasedTimeRate(
-            Carbon::parse($request->input('cdr.timestampStart')),
-            Carbon::parse($request->input('cdr.timestampStop')),
-            $request->input('rate.time')
-        );
-
-        $transaction = $request->input('rate.transaction');
-
-        $overall = round($energy + $time + $transaction, 2);
 
         return response()->json([
-            "overall" => $overall,
+            "overall" => $overallwithDetails['overall'],
             "components" => [
-                "energy" => $energy,
-                "time" => $time,
-                "transaction" => $transaction
+                "energy" => $overallwithDetails['energy'],
+                "time" => $overallwithDetails['time'],
+                "transaction" => $overallwithDetails['transaction']
             ]
         ]);
     }
